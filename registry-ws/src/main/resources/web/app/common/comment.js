@@ -3,14 +3,14 @@ angular.module('comment', ['services.notifications'])
 .controller('CommentCtrl', function ($scope, $state, $stateParams, notifications, Restangular) {
   var type = $state.current.context; // this context should be set in the parent statemachine (e.g. dataset)
   var key = $stateParams.key; // the entity key (e.g. uuid of a dataset)
-  
+
   var comments = Restangular.one(type, key).all('comment');
   comments.getList().then(function(response) {$scope.comments = response});
 
 	var resetState = function() {
-	  $state.transitionTo(type + '.comment', { key: key}); 
+	  $state.transitionTo(type + '.comment', { key: key});
 	}
-  
+
   $scope.save = function(item) {
     var success = function(data) {
       notifications.pushForCurrentRoute("Comment successfully added", 'info');
@@ -19,13 +19,13 @@ angular.module('comment', ['services.notifications'])
       $scope.counts.comments++;
       resetState(); // in case we have logged in
     };
-    
+
     var failure = function(response) {
       notifications.pushForCurrentRoute(response.data, 'error');
-    };    
+    };
     comments.post(item).then(success,failure);
   }
-  
+
   $scope.delete = function(item) {
     var ngItem = _.find($scope.comments, function(i) {
       return item.key == i.key;
@@ -41,5 +41,5 @@ angular.module('comment', ['services.notifications'])
       function(response) {
         notifications.pushForCurrentRoute(response.data, 'error');
       });
-  }  
+  }
 });

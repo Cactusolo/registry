@@ -2,8 +2,8 @@
   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-	
-  <!--  
+
+  <!--
     Changes the data type of metadata.content to byte array as it is hard and error prone to convert streams to various
     character encodings. Best to store xml documents exactly as they come.
   -->

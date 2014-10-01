@@ -3,14 +3,14 @@ angular.module('tag', ['services.notifications'])
 .controller('TagCtrl', function ($scope, $state, $stateParams, notifications, Restangular) {
   var type = $state.current.context; // this context should be set in the parent statemachine (e.g. dataset)
   var key = $stateParams.key; // the entity key (e.g. uuid of a dataset)
-  
+
   var tags = Restangular.one(type, key).all('tag');
   tags.getList().then(function(response) {$scope.tags = response});
 
 	var resetState = function() {
-	  $state.transitionTo(type + '.tag', { key: key}); 
+	  $state.transitionTo(type + '.tag', { key: key});
 	}
-  
+
   $scope.save = function(item) {
     var success = function(data) {
       notifications.pushForCurrentRoute("Tag successfully added", 'info');
@@ -21,13 +21,13 @@ angular.module('tag', ['services.notifications'])
         resetState(); // in case we have logged in
       }
     };
-    
+
     var failure = function(response) {
       notifications.pushForCurrentRoute(response.data, 'error');
-    };    
+    };
     tags.post(item).then(success,failure);
   }
-  
+
   $scope.delete = function(item) {
     var ngItem = _.find($scope.tags, function(i) {
       return item.key == i.key;
@@ -43,5 +43,5 @@ angular.module('tag', ['services.notifications'])
       function(response) {
         notifications.pushForCurrentRoute(response.data, 'error');
       });
-  }  
+  }
 });

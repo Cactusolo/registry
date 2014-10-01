@@ -3,7 +3,7 @@ angular.module('endpoint', ['services.notifications'])
 .controller('EndpointCtrl', function ($scope, $state, $stateParams, notifications, Restangular) {
   var type = $state.current.context; // this context should be set in the parent statemachine (e.g. dataset)
   var key = $stateParams.key; // the entity key (e.g. uuid of a dataset)
-  
+
   var endpoints = Restangular.one(type, key).all('endpoint');
   endpoints.getList().then(function(response) {$scope.endpoints = response});
 
@@ -20,13 +20,13 @@ angular.module('endpoint', ['services.notifications'])
     'TAPIR',
     'BIOCASE',
     'OAI_PMH',
-    'OTHER'  
-  ];	
-  
+    'OTHER'
+  ];
+
 	var resetState = function() {
-	  $state.transitionTo(type + '.endpoint', { key: key}); 
+	  $state.transitionTo(type + '.endpoint', { key: key});
 	}
-  
+
   $scope.save = function(item) {
     var success = function(data) {
       notifications.pushForCurrentRoute("Endpoint successfully added", 'info');
@@ -35,13 +35,13 @@ angular.module('endpoint', ['services.notifications'])
       $scope.counts.endpoints++;
       resetState(); // in case we have logged in
     };
-    
+
     var failure = function(response) {
       notifications.pushForCurrentRoute(response.data, 'error');
-    };    
+    };
     endpoints.post(item).then(success,failure);
   }
-  
+
   $scope.delete = function(item) {
     var ngItem = _.find($scope.endpoints, function(i) {
       return item.key == i.key;
@@ -57,5 +57,5 @@ angular.module('endpoint', ['services.notifications'])
       function(response) {
         notifications.pushForCurrentRoute(response.data, 'error');
       });
-  }  
+  }
 });

@@ -72,6 +72,8 @@ import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import org.apache.bval.guice.Validate;
 import org.mybatis.guice.transactional.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.gbif.registry.ws.security.UserRoles.ADMIN_ROLE;
 import static org.gbif.registry.ws.security.UserRoles.EDITOR_ROLE;

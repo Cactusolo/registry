@@ -1,0 +1,88 @@
+zkHost: "c1n1.gbif.org:2181,c1n2.gbif.org:2181,c1n3.gbif.org:2181"
+environment: dev
+stopSecret: stop
+timestamp: 1
+
+container:
+  externalPort: 8080
+  externalAdminPort: 8081
+  host: local.gbif.org
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 8082
+  adminConnectors:
+    - type: http
+      port: 8083
+  requestLog:
+    timeZone: UTC
+    appenders:
+      - type: file
+        currentLogFilename: logs/registry-ws-requests.log
+        threshold: INFO
+        archive: true
+        archivedLogFilenamePattern: "logs/registry-ws-requests.%d{yyyy-MM-dd}.log.gz"
+        archivedFileCount: 14
+        timeZone: UTC
+        logFormat: "%-5level [%date{'yyyy-MM-dd HH:mm:ss,SSSZ'}] [%thread] %logger: %msg%n%xEx"
+
+logging:
+  level: INFO
+  loggers:
+    org.gbif: INFO
+    org.apache.tomcat.util.digester.Digester: INFO
+  appenders:
+    - type: console
+      logFormat: "%-5level [%date{'yyyy-MM-dd HH:mm:ss,SSSZ'}] [%thread] %logger: %msg%n%xEx"
+    - type: file
+      currentLogFilename: logs/registry-ws.log
+      threshold: INFO
+      archive: true
+      archivedLogFilenamePattern: "logs/registry-ws.%d{yyyy-MM-dd}.log.gz"
+      archivedFileCount: 14
+      timeZone: UTC
+      logFormat: "%-5level [%date{'yyyy-MM-dd HH:mm:ss,SSSZ'}] [%thread] %logger: %msg%n%xEx"
+    - type: file
+      currentLogFilename: "logs/registry-ws_error.log"
+      threshold: ERROR
+      timeZone: UTC
+      archive: true
+      archivedLogFilenamePattern: "logs/registry-ws_error.%d{yyyy-MM-dd}.log.gz"
+      archivedFileCount: 28
+      logFormat: "%-5level [%date{'yyyy-MM-dd HH:mm:ss,SSSZ'}] [%thread] %logger: %msg%n%xEx"
+
+
+apiUrl: ${api.url}
+performIndexSync: true
+sandboxMode: true
+
+# registry database
+db:
+  driver: org.postgresql.Driver
+  url: ${registry.db.url}
+  username: ${registry.db.username}
+  password: ${registry.db.password}
+  enableCache: true
+
+# drupal db for user service
+drupal:
+  driver: com.mysql.jdbc.Driver
+  url: ${drupal.db.url}
+  username: ${drupal.db.username}
+  password: ${drupal.db.password}
+
+# file with all application keys & secrets
+appkeysFile: ${appkeys.file}
+
+devEmail: gbifregistry@mailinator.com
+devEmailEnabled: ${mail.devemail.enabled}
+
+mail:
+  smtpHost: ${mail.smtp.host}
+  smtpPort: 25
+  from: ${mail.from}
+  cc: ${mail.cc}
+
+solr:
+  solrHome: /tmp/solrregistry

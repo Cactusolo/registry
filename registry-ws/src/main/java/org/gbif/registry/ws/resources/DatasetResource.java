@@ -52,6 +52,7 @@ import org.gbif.registry.persistence.mapper.TagMapper;
 import org.gbif.registry.ws.guice.Trim;
 import org.gbif.registry.ws.security.EditorAuthorizationService;
 import org.gbif.ws.server.interceptor.NullToNotFound;
+import org.gbif.ws.util.ExtraMediaTypes;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -124,8 +125,16 @@ public class DatasetResource extends BaseNetworkEntityResource<Dataset>
     CommentMapper commentMapper, EventBus eventBus, DatasetSearchService searchService, MetadataMapper metadataMapper,
     DatasetProcessStatusMapper datasetProcessStatusMapper, NetworkMapper networkMapper,
     EditorAuthorizationService userAuthService) {
-    super(datasetMapper, commentMapper, contactMapper, endpointMapper, identifierMapper, machineTagMapper, tagMapper,
-      Dataset.class, eventBus, userAuthService);
+    super(datasetMapper,
+          commentMapper,
+          contactMapper,
+          endpointMapper,
+          identifierMapper,
+          machineTagMapper,
+          tagMapper,
+          Dataset.class,
+          eventBus,
+          userAuthService);
     this.searchService = searchService;
     this.metadataMapper = metadataMapper;
     this.datasetMapper = datasetMapper;
@@ -236,7 +245,7 @@ public class DatasetResource extends BaseNetworkEntityResource<Dataset>
 
   /**
    * Augments a list of datasets with information from their preferred metadata document.
-   * 
+   *
    * @return a the same paging response with a new list of augmented dataset instances
    */
   private PagingResponse<Dataset> augmentWithMetadata(PagingResponse<Dataset> resp) {
@@ -258,7 +267,7 @@ public class DatasetResource extends BaseNetworkEntityResource<Dataset>
    * <li>These objects are all mutable, and care should be taken that the returned object may be one or the other of the
    * supplied, thus you need to {@code Dataset result = merge(Dataset emlView, Dataset dbView);}</li>
    * </ul>
-   * 
+   *
    * @param target that will be modified with persitable values from the supplementary
    * @param supplementary holding the preferred properties for the target
    * @return the modified tagret dataset, or the supplementary dataset if the target is null

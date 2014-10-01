@@ -17,10 +17,12 @@ import org.gbif.api.vocabulary.Country;
 import org.gbif.ws.server.interceptor.NullToNotFound;
 import org.gbif.ws.util.ExtraMediaTypes;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -28,8 +30,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.ClassPath;
@@ -51,7 +56,7 @@ public class EnumerationResource {
   private static Logger LOG = LoggerFactory.getLogger(EnumerationResource.class);
 
   // Uses reflection to find the enumerations in the API
-  private static Map<String, Enum<?>[]> PATH_MAPPING = enumerations();
+  private static Map<String, List<String>> PATH_MAPPING = enumerations();
 
 
   private static List<Map<String, String>> COUNTRIES;
@@ -74,7 +79,7 @@ public class EnumerationResource {
 
   /**
    * An inventory of the enumerations supported.
-   * 
+   *
    * @return The enumerations in the GBIF API.
    */
   @GET
@@ -84,24 +89,30 @@ public class EnumerationResource {
   }
 
   // reflect over the package to find suitable enumerations
-  private static Map<String, Enum<?>[]> enumerations() {
+  private static Map<String, List<String>> enumerations() {
     try {
       ClassPath cp = ClassPath.from(EnumerationResource.class.getClassLoader());
-      ImmutableMap.Builder<String, Enum<?>[]> builder = ImmutableMap.builder();
+      ImmutableMap.Builder<String, List<String>> builder = ImmutableMap.builder();
 
       List<ClassInfo> infos = cp.getTopLevelClasses(Country.class.getPackage().getName()).asList();
       for (ClassInfo info : infos) {
         Class<? extends Enum<?>> vocab = VocabularyUtils.lookupVocabulary(info.getName());
         // verify that it is an Enumeration
         if (vocab != null && vocab.getEnumConstants() != null) {
-          builder.put(info.getSimpleName(), vocab.getEnumConstants());
+          builder.put(info.getSimpleName(), Lists.transform(Arrays.asList(vocab.getEnumConstants()), new Function<Enum<?>, String>() {
+            @Nullable
+            @Override
+            public String apply(@Nullable Enum<?> input) {
+              return input.name();
+            }
+          }));
         }
       }
       return builder.build();
 
     } catch (Exception e) {
       LOG.error("Unable to read the classpath for enumerations", e);
-      return ImmutableMap.<String, Enum<?>[]>of(); // empty
+      return ImmutableMap.<String, List<String>>of(); // empty
     }
   }
 
@@ -117,14 +128,15 @@ public class EnumerationResource {
   /**
    * Gets the values of the named enumeration should the enumeration exist.
    * Note this is used by the AngularJS console.
-   * 
+   *
    * @param name Which should be the enumeration name in the GBIF vocabulary package (e.g. Country)
    * @return The enumeration values or null if the enumeration does not exist.
    */
   @Path("basic/{name}")
   @GET()
   @NullToNotFound
-  public Enum<?>[] getEnumeration(@PathParam("name") @NotNull String name) {
+  public List<String> getEnumeration(@PathParam("name") @NotNull String name) {
+    LOG.info("getting " + name);
     if (PATH_MAPPING.containsKey(name)) {
       return PATH_MAPPING.get(name);
     } else {

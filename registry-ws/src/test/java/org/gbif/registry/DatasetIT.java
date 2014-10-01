@@ -472,7 +472,7 @@ public class DatasetIT extends NetworkEntityTest<Dataset> {
 
   /**
    * Create a number of new Datasets, having a particular dataset type.
-   * 
+   *
    * @param type dataset type
    * @param number amount of datasets to create
    */
